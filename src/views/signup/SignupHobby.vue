@@ -165,7 +165,7 @@ const detailJobRules = [
                                 <span class="sub-title">- 잘 기억이 안나거나 모르는 경우 패스할 수 있어요 !</span>
                                 <div class="d-flex justify-center align-center w-100">
                                     <div
-                                        style="display: grid; grid-template-columns: repeat(2, 1fr); grid-gap: 8px; width: 80%; margin-inside: auto;"
+                                        style="display: grid; grid-template-columns: repeat(2, 1fr); grid-gap: 8px; width: 80%; margin-inline: auto;"
                                     >
                                         <template v-for="(el, i) in mbtiOptions" :key="`mbti_${i}`">
                                             <signup-radio
