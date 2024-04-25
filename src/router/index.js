@@ -29,7 +29,11 @@ const routes = [
     { path: "/signupTest", component: SignupSimple },
     {
         path: "/",
-        component: MainTitle
+        component: LandingMain
+    },
+    {
+        path: "/intro",
+        component: LandingIntro
     },
     {
         path: "/",
@@ -117,7 +121,12 @@ const routes = [
 
 const router = createRouter({
     history: createWebHistory(),
-    routes
+    routes,
+    scrollBehavior(to, from) {
+        if (to.fullPath.includes("signup")) {
+            return { top: 0 };
+        }
+    }
 });
 router.beforeEach((to, from, next) => {
     const userStore = userInfoStore();
