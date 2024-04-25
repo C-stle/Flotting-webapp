@@ -3,13 +3,41 @@ import MainHeader from "@/components/layout/MainHeader.vue";
 import { ref } from "vue";
 import router from "@/router";
 import SignupProgress from "@/views/signup/components/SignupProgress.vue";
-const gender = ref("");
-const height = ref(150);
-const location = ref("");
-const appliedPath = ref("");
-const clickNext = () => {
-    router.push("/signup/world");
+import SignupRadio from "@/views/signup/components/SignupRadio.vue";
+import { signupInfoStore } from "@/views/signup/store/singupInfoStore";
+import { storeToRefs } from "pinia";
+import { appliedPathOptions, genderOptions, locationOptions } from "@/views/signup/enum/options";
+
+const store = signupInfoStore();
+const { name, birth, height, gender, location, detailLocation, appliedPath, recommendUserName } = storeToRefs(store);
+const form = ref();
+const onClickedDone = async () => {
+    const { valid } = await form.value.validate();
+
+    const radioValid = gender.value !== "" && location.value !== "" && appliedPath.value !== "";
+
+    if (!valid || !radioValid) {
+        alert("1 ~ 6번까지 모든 문항을 입력해주세요!");
+        return;
+    }
+
+    await router.push("/signup/world");
 };
+
+const nameRules = [value => !!value || "필수 값 입니다.", value => value.length >= 2 || "2 글자 이상", value => value.length <= 10 || "10 글자 이하"];
+
+const birthRules = [
+    value => !!value || "필수 값 입니다.",
+    value => /[0-9]/.test(value) || "숫자만 입력해주세요.",
+    value => value.length === 6 || "YYMMDD",
+    value => /(?:\d{2})(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])$/.test(value) || "잘못된 형식 입니다."
+];
+
+const detailLocationRules = [
+    value => !!value || "필수 값 입니다.",
+    value => /[^0-9]/.test(value) || "글자만 입력해주세요.",
+    value => value.length <= 10 || "10 글자 이하로 입력해주세요."
+];
 </script>
 
 <template>
@@ -17,241 +45,124 @@ const clickNext = () => {
         <main-header start="back" end="" :title="false" />
         <main class="w-100 h-100" style="padding-top: 60px;">
             <div class="mx-auto" style="max-width: 390px; min-width: 360px;">
-                <div class="w-100 d-flex flex-column justify-center align-center" style="padding-top: 29px; padding-inline: 18px;">
-                    <signup-progress :idx="1" />
-                    <div class="d-flex flex-column w-100 ga-6 mb-8">
-                        <div class="d-flex flex-column ga-3">
-                            <span class="text-none title-text">(1) 본인 성함</span>
-                            <v-text-field
-                                class="text-none input-text"
-                                density="compact"
-                                placeholder="예시 ) 최연아"
-                                variant="plain"
-                                hide-details
-                                :clearable="true"
-                            ></v-text-field>
-                        </div>
-                        <div class="d-flex flex-column ga-3">
-                            <span class="text-none title-text">(2) 본인 생년월일 6자리</span>
-                            <v-text-field
-                                class="text-none input-text"
-                                density="compact"
-                                placeholder="예시 ) 950830"
-                                variant="plain"
-                                hide-details
-                                :clearable="true"
-                            ></v-text-field>
-                        </div>
-                        <div class="d-flex flex-column ga-3">
-                            <div class="d-flex justify-space-between">
-                                <span class="text-none title-text">(3) 본인 신장</span>
-                                <span class="text-none title-text">{{ height }}</span>
+                <v-form ref="form">
+                    <div class="w-100 d-flex flex-column justify-center align-center" style="padding: 29px 18px;">
+                        <signup-progress :idx="1" />
+                        <div class="d-flex flex-column w-100 ga-6 mb-8">
+                            <div class="d-flex flex-column">
+                                <span class="text-none title-text">(1) 본인 성함</span>
+                                <v-text-field
+                                    v-model="name"
+                                    class="text-none input-text"
+                                    placeholder="최연아"
+                                    variant="underlined"
+                                    :clearable="true"
+                                    :rules="nameRules"
+                                    counter="10"
+                                ></v-text-field>
                             </div>
-                            <div>
-                                <v-slider v-model="height" min="140" max="200" :step="1" thumb-label color="#60E0E0" hide-details>
-                                    <template #thumb-label="{modelValue}"> {{ modelValue }}</template>
-                                </v-slider>
-                                <div class="d-flex w-100 justify-space-between">
-                                    <span class="text-none slider-text">140</span>
-                                    <span class="text-none slider-text">200</span>
+                            <div class="d-flex flex-column">
+                                <span class="text-none title-text">(2) 본인 생년월일 6자리</span>
+                                <v-text-field
+                                    v-model="birth"
+                                    class="text-none input-text"
+                                    placeholder="010830"
+                                    variant="underlined"
+                                    :clearable="true"
+                                    :rules="birthRules"
+                                    counter="6"
+                                ></v-text-field>
+                            </div>
+                            <div class="d-flex flex-column ga-2">
+                                <div class="d-flex justify-space-between">
+                                    <span class="text-none title-text">(3) 본인 신장</span>
+                                    <span class="text-none title-text">{{ height }}</span>
                                 </div>
                                 <span class="text-none caution">* 허위 작성 시 서비스 이용 제지 사유</span>
-                            </div>
-                        </div>
-                        <div class="d-flex flex-column ga-3">
-                            <span class="text-none title-text">(4) 본인 성별</span>
-                            <div class="d-flex" style="gap: 10px;">
-                                <div
-                                    class="radio"
-                                    :class="gender === 'man' && 'radio-clicked'"
-                                    @click="gender === 'man' ? (gender = '') : (gender = 'man')"
-                                >
-                                    <span>남성</span>
-                                </div>
-                                <div
-                                    class="radio"
-                                    :class="gender === 'woman' && 'radio-clicked'"
-                                    @click="gender === 'woman' ? (gender = '') : (gender = 'woman')"
-                                >
-                                    <span>여성</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="d-flex flex-column ga-3">
-                            <span class="text-none title-text">(5-1) 본인 거주지</span>
-                            <div class="d-flex flex-column" style="gap: 10px;">
-                                <div class="d-flex" style="gap: 10px;">
-                                    <div
-                                        class="radio"
-                                        :class="location === 'seoul-north' && 'radio-clicked'"
-                                        @click="location === 'seoul-north' ? (location = '') : (location = 'seoul-north')"
-                                    >
-                                        <span>서울 북부</span>
-                                    </div>
-                                    <div
-                                        class="radio"
-                                        :class="location === 'seoul-south' && 'radio-clicked'"
-                                        @click="location === 'seoul-south' ? (location = '') : (location = 'seoul-south')"
-                                    >
-                                        <span>서울 남부</span>
-                                    </div>
-                                    <div
-                                        class="radio"
-                                        :class="location === 'seoul-east' && 'radio-clicked'"
-                                        @click="location === 'seoul-east' ? (location = '') : (location = 'seoul-east')"
-                                    >
-                                        <span>서울 동부</span>
-                                    </div>
-                                </div>
-                                <div class="d-flex" style="gap: 10px;">
-                                    <div
-                                        class="radio"
-                                        :class="location === 'seoul-west' && 'radio-clicked'"
-                                        @click="location === 'seoul-west' ? (location = '') : (location = 'seoul-west')"
-                                    >
-                                        <span>서울 서부</span>
-                                    </div>
-                                    <div
-                                        class="radio"
-                                        :class="location === 'gi-north' && 'radio-clicked'"
-                                        @click="location === 'gi-north' ? (location = '') : (location = 'gi-north')"
-                                    >
-                                        <span>경기 북부</span>
-                                    </div>
-                                    <div
-                                        class="radio"
-                                        :class="location === 'gi-south' && 'radio-clicked'"
-                                        @click="location === 'gi-south' ? (location = '') : (location = 'gi-south')"
-                                    >
-                                        <span>경기 남부</span>
-                                    </div>
-                                </div>
-                                <div class="d-flex" style="gap: 10px;">
-                                    <div
-                                        class="radio"
-                                        :class="location === 'gi-east' && 'radio-clicked'"
-                                        @click="location === 'gi-east' ? (location = '') : (location = 'gi-east')"
-                                    >
-                                        <span>경기 동부</span>
-                                    </div>
-                                    <div
-                                        class="radio"
-                                        :class="location === 'gi-west' && 'radio-clicked'"
-                                        @click="location === 'gi-west' ? (location = '') : (location = 'gi-west')"
-                                    >
-                                        <span>경기 서부</span>
+                                <div>
+                                    <v-slider v-model="height" min="140" max="200" :step="1" thumb-label color="#60E0E0" hide-details>
+                                        <template #thumb-label="{modelValue}"> {{ modelValue }}</template>
+                                    </v-slider>
+                                    <div class="d-flex w-100 justify-space-between">
+                                        <span class="text-none slider-text">140</span>
+                                        <span class="text-none slider-text">200</span>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="d-flex flex-column ga-3">
-                            <span class="text-none title-text">(5-2) 본인 상세 거주지</span>
-                            <div>
+                            <div class="d-flex flex-column ga-3">
+                                <span class="text-none title-text">(4) 본인 성별</span>
+                                <div style="display: grid; grid-template-columns: repeat(2, 1fr); grid-gap: 8px;">
+                                    <signup-radio
+                                        v-for="({ value, title }, i) in genderOptions"
+                                        :key="`gen_${i}`"
+                                        :group-value="gender"
+                                        :value="value"
+                                        :title="title"
+                                        @click="val => (gender = val)"
+                                    />
+                                </div>
+                            </div>
+                            <div class="d-flex flex-column ga-3">
+                                <span class="text-none title-text">(5-1) 본인 거주지</span>
+                                <div style="display: grid; grid-template-columns: repeat(3, 1fr); grid-gap: 8px;">
+                                    <signup-radio
+                                        v-for="({ value, title }, i) in locationOptions"
+                                        :key="`loc_${i}`"
+                                        :group-value="location"
+                                        :value="value"
+                                        :title="title"
+                                        @click="val => (location = val)"
+                                    />
+                                </div>
+                            </div>
+                            <div class="d-flex flex-column ga-2">
+                                <span class="text-none title-text">(5-2) 본인 상세 거주지</span>
+                                <span class="sub-title">- 상세 주소 입력 시 00시 00구 까지 입력</span>
                                 <v-text-field
+                                    v-model="detailLocation"
+                                    class="text-none input-text"
+                                    placeholder="서울시 서초구"
+                                    variant="underlined"
+                                    :clearable="true"
+                                    counter="10"
+                                    :rules="detailLocationRules"
+                                ></v-text-field>
+                            </div>
+                            <div class="d-flex flex-column ga-3">
+                                <span class="text-none title-text">(6) 신청 경로</span>
+                                <div style="display: grid; grid-template-columns: repeat(3, 1fr); grid-gap: 8px;">
+                                    <signup-radio
+                                        v-for="({ value, title }, i) in appliedPathOptions"
+                                        :key="`applied_${i}`"
+                                        :group-value="appliedPath"
+                                        :value="value"
+                                        :title="title"
+                                        @click="val => (appliedPath = val)"
+                                    />
+                                </div>
+                            </div>
+                            <div class="d-flex flex-column ga-3">
+                                <span class="text-none title-text">(7) 추천인 코드</span>
+                                <v-text-field
+                                    v-model="recommendUserName"
                                     class="text-none input-text"
                                     density="compact"
-                                    placeholder="예시 ) 서울시 서초구"
+                                    placeholder="예시 ) 김현욱"
                                     variant="plain"
                                     hide-details
                                     :clearable="true"
                                 ></v-text-field>
-                                <span class="text-none caution">* 상세 주소 입력 시 00시 00구 까지 입력</span>
                             </div>
                         </div>
-                        <div class="d-flex flex-column ga-3">
-                            <span class="text-none title-text">(6) 신청 경로</span>
-                            <div class="d-flex flex-column" style="gap: 10px;">
-                                <div class="d-flex" style="gap: 10px;">
-                                    <div
-                                        class="radio"
-                                        :class="appliedPath === '1' && 'radio-clicked'"
-                                        @click="appliedPath === '1' ? (appliedPath = '') : (appliedPath = '1')"
-                                    >
-                                        <span>소모임</span>
-                                    </div>
-                                    <div
-                                        class="radio"
-                                        :class="appliedPath === '2' && 'radio-clicked'"
-                                        @click="appliedPath === '2' ? (appliedPath = '') : (appliedPath = '2')"
-                                    >
-                                        <span>프립</span>
-                                    </div>
-                                    <div
-                                        class="radio"
-                                        :class="appliedPath === '3' && 'radio-clicked'"
-                                        @click="appliedPath === '3' ? (appliedPath = '') : (appliedPath = '3')"
-                                    >
-                                        <span>포탈 검색</span>
-                                    </div>
-                                </div>
-                                <div class="d-flex" style="gap: 10px;">
-                                    <div
-                                        class="radio"
-                                        :class="appliedPath === '4' && 'radio-clicked'"
-                                        @click="appliedPath === '4' ? (appliedPath = '') : (appliedPath = '4')"
-                                    >
-                                        <span>네이버 카페</span>
-                                    </div>
-                                    <div
-                                        class="radio"
-                                        :class="appliedPath === '5' && 'radio-clicked'"
-                                        @click="appliedPath === '5' ? (appliedPath = '') : (appliedPath = '5')"
-                                    >
-                                        <span>인스타그램</span>
-                                    </div>
-                                    <div
-                                        class="radio"
-                                        :class="appliedPath === '6' && 'radio-clicked'"
-                                        @click="appliedPath === '6' ? (appliedPath = '') : (appliedPath = '6')"
-                                    >
-                                        <span>네이버 스토어</span>
-                                    </div>
-                                </div>
-                                <div class="d-flex" style="gap: 10px;">
-                                    <div
-                                        class="radio"
-                                        :class="appliedPath === '7' && 'radio-clicked'"
-                                        @click="appliedPath === '7' ? (appliedPath = '') : (appliedPath = '7')"
-                                    >
-                                        <span>와디즈</span>
-                                    </div>
-                                    <div
-                                        class="radio"
-                                        :class="appliedPath === '8' && 'radio-clicked'"
-                                        @click="appliedPath === '8' ? (appliedPath = '') : (appliedPath = '8')"
-                                    >
-                                        <span>기타</span>
-                                    </div>
-                                    <div
-                                        class="radio"
-                                        :class="appliedPath === '9' && 'radio-clicked'"
-                                        @click="appliedPath === '9' ? (appliedPath = '') : (appliedPath = '9')"
-                                    >
-                                        <span>지인 추천</span>
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="d-flex flex-column text-none security-text mb-9">
+                            <span>수집된 개인정보는</span>
+                            <span>매칭 외 다른 용도로 활용되지 않습니다.</span>
                         </div>
-                        <div class="d-flex flex-column ga-3">
-                            <span class="text-none title-text">(7) 추천인 코드</span>
-                            <v-text-field
-                                class="text-none input-text"
-                                density="compact"
-                                placeholder="예시 ) 김현욱"
-                                variant="plain"
-                                hide-details
-                                :clearable="true"
-                            ></v-text-field>
+                        <div>
+                            <v-btn class="text-none bottom-btn" @click="onClickedDone">세계관 등록하러 가기</v-btn>
                         </div>
                     </div>
-                    <div class="d-flex flex-column text-none security-text mb-9">
-                        <span>수집된 개인정보는</span>
-                        <span>매칭 외 다른 용도로 활용되지 않습니다.</span>
-                    </div>
-                    <div>
-                        <v-btn class="text-none bottom-btn" @click="clickNext">세계관 등록하러 가기</v-btn>
-                    </div>
-                </div>
+                </v-form>
             </div>
         </main>
     </div>
@@ -267,14 +178,11 @@ const clickNext = () => {
 }
 .input-text {
     height: fit-content;
-    border: 2px solid #b6b6b6;
-    border-radius: 12px;
     letter-spacing: 0;
     font-size: 16px;
     font-weight: 700;
     line-height: 19px;
     text-align: left;
-    padding: 4px 12px 12px 12px;
 }
 .caution {
     font-size: 12px;
@@ -323,7 +231,7 @@ const clickNext = () => {
 .bottom-btn {
     width: 316px;
     height: 58px;
-    padding: 17px 49px;
+    padding-inline: 49px;
     border-radius: 16px;
     border: 1px solid #dfdfdf;
     box-shadow: 0px 4px 4px 0px #00000040;
@@ -335,5 +243,14 @@ const clickNext = () => {
     background: #60e0e0;
     letter-spacing: 0;
     margin-bottom: 30px;
+}
+
+.sub-title {
+    letter-spacing: 0;
+    color: #35a8aa;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 15px;
+    text-align: left;
 }
 </style>

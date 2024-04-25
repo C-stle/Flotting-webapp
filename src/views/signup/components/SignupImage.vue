@@ -27,9 +27,8 @@ const onClicked = key => {
         v-else
         :src="imageSrc"
         alt=""
-        height="100%"
         width="100%"
-        style="object-fit: cover; border-radius: 16px; cursor:pointer; border: 2px solid #b6b6b6;"
+        style="aspect-ratio: 1; object-fit: cover; border-radius: 16px; cursor:pointer; border: 2px solid #b6b6b6;"
         @click="onClicked"
     />
     <input ref="inputRef" type="file" maxlength="1" accept="image/*" hidden @change="onChangedImage($event.target.files)" />
@@ -46,7 +45,9 @@ const onClicked = key => {
     font-weight: 700;
     line-height: 19px;
     text-align: center;
-    align-content: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     cursor: pointer;
     white-space: pre-wrap;
 }

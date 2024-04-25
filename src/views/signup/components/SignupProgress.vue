@@ -9,7 +9,7 @@ defineProps({
 
 <template>
     <span
-        :class="idx === 0 && 'title-non-active'"
+        :class="idx === 5 && 'title-non-active'"
         style="font-size: 28px; font-weight: 800; line-height: 34px; text-align: center; padding-bottom: 16px;"
         >프로필 등록 진행 현황</span
     >
@@ -17,8 +17,8 @@ defineProps({
         <div class="d-flex flex-column justify-center align-center" style="gap: 6px;">
             <div class="d-flex justify-center align-center" style="border-radius: 100%; border: 1px solid #DFDFDF; width: 30px; height:30px;">
                 <div
-                    :class="[0, 1].includes(idx) ? 'active' : 'non-active'"
-                    style="border-radius: 100%;width: 25px; height:25px; text-align: center; align-content: center; color: #FFFFFF; font-size: 10px; font-weight: 800; line-height: 12px;"
+                    :class="[1, 5].includes(idx) ? 'active' : 'non-active'"
+                    style="display: flex; justify-content: center; align-items: center; border-radius: 100%;width: 25px; height:25px; color: #FFFFFF; font-size: 12px; font-weight: 800; line-height: 15px;"
                 >
                     1
                 </div>
@@ -30,8 +30,8 @@ defineProps({
         <div class="d-flex flex-column justify-center align-center" style="gap: 6px;">
             <div class="d-flex justify-center align-center" style="border-radius: 100%; border: 1px solid #DFDFDF; width: 30px; height:30px;">
                 <div
-                    :class="[0, 2].includes(idx) ? 'active' : 'non-active'"
-                    style="border-radius: 100%; width: 25px; height:25px; text-align: center; align-content: center; color: #FFFFFF; font-size: 10px; font-weight: 800; line-height: 12px;"
+                    :class="[2, 5].includes(idx) ? 'active' : 'non-active'"
+                    style="display: flex; justify-content: center; align-items: center; border-radius: 100%;width: 25px; height:25px; color: #FFFFFF; font-size: 12px; font-weight: 800; line-height: 15px;"
                 >
                     2
                 </div>
@@ -43,8 +43,8 @@ defineProps({
         <div class="d-flex flex-column justify-center align-center" style="gap: 6px;">
             <div class="d-flex justify-center align-center" style="border-radius: 100%; border: 1px solid #DFDFDF; width: 30px; height:30px;">
                 <div
-                    :class="[0, 3].includes(idx) ? 'active' : 'non-active'"
-                    style="border-radius: 100%; width: 25px; height:25px; text-align: center; align-content: center; color: #FFFFFF; font-size: 10px; font-weight: 800; line-height: 12px;"
+                    :class="[3, 5].includes(idx) ? 'active' : 'non-active'"
+                    style="display: flex; justify-content: center; align-items: center; border-radius: 100%;width: 25px; height:25px; color: #FFFFFF; font-size: 12px; font-weight: 800; line-height: 15px;"
                 >
                     3
                 </div>
@@ -56,8 +56,8 @@ defineProps({
         <div class="d-flex flex-column justify-center align-center" style="gap: 6px;">
             <div class="d-flex justify-center align-center" style="border-radius: 100%; border: 1px solid #DFDFDF; width: 30px; height:30px;">
                 <div
-                    :class="[0, 4].includes(idx) ? 'active' : 'non-active'"
-                    style="border-radius: 100%; width: 25px; height:25px; text-align: center; align-content: center; color: #FFFFFF; font-size: 10px; font-weight: 800; line-height: 12px;"
+                    :class="[4, 5].includes(idx) ? 'active' : 'non-active'"
+                    style="display: flex; justify-content: center; align-items: center; border-radius: 100%;width: 25px; height:25px; color: #FFFFFF; font-size: 12px; font-weight: 800; line-height: 15px;"
                 >
                     4
                 </div>

@@ -2,9 +2,14 @@
 import MainHeader from "@/components/layout/MainHeader.vue";
 import router from "@/router";
 import SignupProgress from "@/views/signup/components/SignupProgress.vue";
-
+import { signupInfoStore } from "@/views/signup/store/singupInfoStore";
 const onClicked = () => {
     router.push("/signup/photo");
+};
+
+const store = signupInfoStore();
+const onClickedTest = () => {
+    console.log(store.getTotal());
 };
 </script>
 
@@ -14,7 +19,7 @@ const onClicked = () => {
         <main class="w-100 h-100" style="padding-top: 60px;">
             <div class="mx-auto" style="max-width: 390px; min-width: 360px;">
                 <div class="w-100 d-flex flex-column justify-center align-center" style="padding-top: 29px; padding-inline: 18px;">
-                    <signup-progress />
+                    <signup-progress :idx="5" />
                     <div class="w-100 d-flex flex-column ga-3 page-guide">
                         <span class="page-title">프로필 등록이 완료되셨어요 !</span>
                         <div class="d-flex flex-column">
@@ -41,6 +46,7 @@ const onClicked = () => {
                         <span>매칭 외 다른 용도로 활용되지 않습니다.</span>
                     </div>
                     <v-btn class="bottom-btn" @click="onClicked">플러팅 둘러보기</v-btn>
+                    <v-btn class="bottom-btn" @click="onClickedTest">정보 확인</v-btn>
                 </div>
             </div>
         </main>
@@ -79,7 +85,7 @@ const onClicked = () => {
 .bottom-btn {
     width: 316px;
     height: 58px;
-    padding: 17px 49px;
+    padding-inline: 49px;
     border-radius: 16px;
     border: 1px solid #dfdfdf;
     box-shadow: 0px 4px 4px 0px #00000040;

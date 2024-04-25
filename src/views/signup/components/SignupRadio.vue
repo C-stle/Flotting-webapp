@@ -5,7 +5,7 @@ const props = defineProps({
         required: true
     },
     groupValue: {
-        type: String,
+        type: [String, Array],
         required: true
     },
     title: {
@@ -17,12 +17,20 @@ const props = defineProps({
 const emit = defineEmits(["click"]);
 
 const onClick = () => {
-    emit("click", props.groupValue === props.value ? "" : props.value);
+    if (typeof props.groupValue === "string") {
+        emit("click", props.groupValue === props.value ? "" : props.value);
+    } else {
+        emit("click", props.value);
+    }
 };
 </script>
 
 <template>
-    <div class="radio" :class="groupValue === value && 'radio-clicked'" @click="onClick">
+    <div
+        class="radio"
+        :class="typeof groupValue === 'string' ? groupValue === value && 'radio-clicked' : groupValue.includes(value) && 'radio-clicked'"
+        @click="onClick"
+    >
         {{ title }}
     </div>
 </template>
@@ -43,6 +51,7 @@ const onClick = () => {
     text-align: center;
     cursor: pointer;
     letter-spacing: 0;
+    white-space: pre-wrap;
 }
 .radio-clicked {
     border: 2px solid #60e0e0;
